@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:onequizadmin/models/question_model.dart';
 import 'package:onequizadmin/templates/question.dart';
 
 void main() {
@@ -12,9 +13,12 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Question App',
       theme: ThemeData(
+        useMaterial3: true,
         primarySwatch: Colors.blue,
       ),
-      home: const Question(),
+      home: QuestionW(
+        question: Question(),
+      ),
     );
   }
 }
