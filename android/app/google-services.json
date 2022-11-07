@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "82560807642",
+    "project_id": "onequiz-bd727",
+    "storage_bucket": "onequiz-bd727.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:82560807642:android:9d9e15a29da1b1ea9c2be3",
+        "android_client_info": {
+          "package_name": "com.example.onequizadmin"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "82560807642-8subvg55b3dl5p8448st9lu0fqjrhaqm.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDj2uzT9dKh4iLUb5I0UZ7sbrxcsyN8wxc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "82560807642-8subvg55b3dl5p8448st9lu0fqjrhaqm.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
