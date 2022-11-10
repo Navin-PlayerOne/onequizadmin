@@ -29,6 +29,13 @@
             {
               "client_id": "82560807642-8subvg55b3dl5p8448st9lu0fqjrhaqm.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "82560807642-44jeh028l92gou4dsoae78031108o3r9.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.onequizadmin"
+              }
             }
           ]
         }
