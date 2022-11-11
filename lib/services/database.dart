@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -41,8 +43,10 @@ class DatabaseService {
   }
 
   Future registerUser() async {
-    return await adminCollection.doc(uid).set(
-        {'testList': [], 'Name': FirebaseAuth.instance.currentUser!.displayName});
+    return await adminCollection.doc(uid).set({
+      'testList': [],
+      'Name': FirebaseAuth.instance.currentUser!.displayName
+    });
   }
 
   Future postTestDetails(Test test) async {
@@ -73,7 +77,7 @@ class DatabaseService {
           'testName': test.testName,
           'supportMail': test.contactMail,
           'testCode': test.testCode,
-          'isCloded': test.isOpen,
+          'isClosed': test.isOpen,
           'questionsCollectionId': test.questionsCollectionId,
           'scoreBoardCollectionId': test.scoreBoardCollectionId
         })
@@ -82,5 +86,38 @@ class DatabaseService {
 
     if (!everythingOk) return false;
     if (everythingOk) return true;
+  }
+
+  Future<List<Test>> _test_from_snapshot(DocumentSnapshot snapshot) async {
+    Map<dynamic, dynamic> testListbuf = snapshot.data() as Map;
+    List<dynamic> testIds = testListbuf['testList'];
+    List<Test> testList = [];
+    for (int i = 0; i < testIds.length; i++) {
+      await testCollection.doc(testIds[i]).get().then((value) {
+        Map<dynamic, dynamic> eachTest = value.data() as Map;
+        print("------");
+        print(eachTest['testName']);
+        print("------");
+        testList.add(Test(
+          completedCount: 0,
+          contactMail: eachTest['supportMail'],
+          isOpen: eachTest['isClosed'],
+          name: eachTest['Name'],
+          questionsCollectionId: eachTest['questionsCollectionId'],
+          scoreBoardCollectionId: eachTest['scoreBoardCollectionId'],
+          testCode: eachTest['testCode'],
+          testName: eachTest['testName'],
+          testid: value.id,
+        ));
+      });
+    }
+    return testList;
+  }
+
+  Future<List<Test>> get test_list {
+    return adminCollection
+        .doc(uid)
+        .get()
+        .then((value) => _test_from_snapshot(value));
   }
 }

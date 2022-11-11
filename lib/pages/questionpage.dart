@@ -17,13 +17,12 @@ PageController _controller = PageController();
 List<Question> questions = [Question()];
 int currentIndex = 0;
 Map<String, Test> testMap = {};
-Test test = Test();
 
 class _QuestionPageBuilderState extends State<QuestionPageBuilder> {
   @override
   Widget build(BuildContext context) {
     testMap = ModalRoute.of(context)!.settings.arguments as Map<String, Test>;
-    test = testMap['test']!;
+    Test test = testMap['test']!;
     print(testMap);
     print(test.testName);
     print(test.questionsCollectionId);

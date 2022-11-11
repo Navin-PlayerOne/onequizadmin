@@ -1,11 +1,21 @@
 class Test {
-  late String name;
-  late String testid;
-  late String contactMail;
-  late String testName;
-  late String testCode;
-  late bool isOpen;
-  late String questionsCollectionId;
-  late String scoreBoardCollectionId;
-  late int completedCount;
+  final String name;
+  final String testid;
+  final String contactMail;
+  final String testName;
+  final String testCode;
+  final int isOpen;
+  final String questionsCollectionId;
+  final String scoreBoardCollectionId;
+  final int completedCount;
+  Test(
+      {required this.completedCount,
+      required this.contactMail,
+      required this.isOpen,
+      required this.name,
+      required this.questionsCollectionId,
+      required this.scoreBoardCollectionId,
+      required this.testCode,
+      required this.testName,
+      required this.testid});
 }

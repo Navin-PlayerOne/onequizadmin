@@ -5,7 +5,6 @@ import 'package:onequizadmin/models/test.dart';
 
 class TestDetails extends StatelessWidget {
   TestDetails({super.key});
-  final Test test = Test();
   final TextEditingController _testName = TextEditingController();
   final TextEditingController _contactMail = TextEditingController();
   @override
@@ -63,13 +62,17 @@ class TestDetails extends StatelessWidget {
                   child: MaterialButton(
                     onPressed: () {
                       if (isValid(_contactMail, _testName)) {
-                        test.testName = _testName.text;
-                        test.contactMail = _contactMail.text;
-                        test.isOpen = true;
-                        test.testCode = getRandomString(5);
-                        test.questionsCollectionId = getRandomString(7);
-                        test.testid = getRandomString(7);
-                        test.scoreBoardCollectionId = getRandomString(8);
+                         final Test test = Test(
+                          completedCount: 0,
+                          contactMail: _contactMail.text,
+                          isOpen: 1,
+                          name: "",
+                          questionsCollectionId: getRandomString(7),
+                          scoreBoardCollectionId: getRandomString(8),
+                          testCode: getRandomString(5),
+                          testName: _testName.text,
+                          testid: getRandomString(7)
+                         );
                         Navigator.pushReplacementNamed(context, '/question',
                             arguments: {'test': test});
                       } else {

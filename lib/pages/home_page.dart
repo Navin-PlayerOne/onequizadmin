@@ -1,6 +1,8 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:onequizadmin/models/test.dart';
 import 'package:onequizadmin/services/authstate.dart';
+import 'package:onequizadmin/services/database.dart';
 
 import '../templates/homepagetestview.dart';
 
@@ -11,7 +13,7 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePageState();
 }
 
-List<Test> _test = [Test(), Test()];
+List<Test> _test = [];
 
 class _HomePageState extends State<HomePage> {
   @override
@@ -22,18 +24,6 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    _test.first.contactMail = "playerone@gmail.com";
-    _test.first.isOpen = true;
-    _test.first.testCode = "1234";
-    _test.first.testName = "Natural by Belivers";
-    _test.first.name = "PlayerOne";
-    _test.first.completedCount = 7;
-    _test.last.contactMail = "playerone@gmail.com";
-    _test.last.isOpen = false;
-    _test.last.testCode = "1234";
-    _test.last.testName = "Unstopable";
-    _test.last.name = "Parzival";
-    _test.last.completedCount = 69;
     //print(FirebaseAuth.instance.currentUser.toString());
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.background,
@@ -94,8 +84,19 @@ class _HomePageState extends State<HomePage> {
       ),
     );
   }
-  
-  void getTestMetaData() async{
-    
+
+  void getTestMetaData() async {
+    print("plz wait");
+    try {
+      List<Test> currentTestList =
+          await DatabaseService(uid: FirebaseAuth.instance.currentUser!.uid)
+              .test_list;
+      setState(() {
+        _test = currentTestList;
+        print(currentTestList);
+      });
+    } catch (e) {
+      print("no data found");
+    }
   }
 }

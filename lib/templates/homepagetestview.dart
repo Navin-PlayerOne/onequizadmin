@@ -25,11 +25,11 @@ class _PageWidgetState extends State<PageWidget> {
           color: Theme.of(context).colorScheme.background,
           borderOnForeground: true,
           child: ListTile(
-            title: Text(widget.test.elementAt(index).testName),
+            title: Text(widget.test.elementAt(index).testName ?? "errorLoadingTest"),
             subtitle: Text("test by ${widget.test.elementAt(index).name}"),
             onTap: () => print("selected ${index + 1}"),
             contentPadding: const EdgeInsets.all(10),
-            leading: widget.test.elementAt(index).isOpen
+            leading: widget.test.elementAt(index).isOpen==1
                 ? const Icon(Icons.cell_tower, color: Colors.green)
                 : const Icon(Icons.wifi_tethering_off, color: Colors.red),
             trailing: Row(
