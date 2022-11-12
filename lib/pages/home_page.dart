@@ -14,16 +14,34 @@ class HomePage extends StatefulWidget {
 }
 
 List<Test> _test = [];
+int count = 0;
 
 class _HomePageState extends State<HomePage> {
   @override
   void initState() {
-    // TODO: implement initState
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text('refreshing feeds...'),
+        backgroundColor: Colors.green,
+      ));
+    });
     getTestMetaData();
   }
 
   @override
   Widget build(BuildContext context) {
+    // SchedulerBinding.instance.addPostFrameCallback((_) {
+    //   ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+    //     content: Text('refreshing feeds...'),
+    //     backgroundColor: Colors.green,
+    //   ));
+    // });
+    // WidgetsBinding.instance.addPostFrameCallback((_) {
+    //   ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+    //     content: Text('refreshing feeds...'),
+    //     backgroundColor: Colors.green,
+    //   ));
+    // });
     //print(FirebaseAuth.instance.currentUser.toString());
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.background,
@@ -64,7 +82,13 @@ class _HomePageState extends State<HomePage> {
               },
               onSelected: (value) {
                 if (value == 0) {
-                  print("My account menu is selected.");
+                  setState(() {
+                    getTestMetaData();
+                  });
+                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                    content: Text('refreshing feeds...'),
+                    backgroundColor: Colors.green,
+                  ));
                 } else if (value == 1) {
                   AuthService().signOut();
                 }
@@ -92,8 +116,12 @@ class _HomePageState extends State<HomePage> {
           await DatabaseService(uid: FirebaseAuth.instance.currentUser!.uid)
               .test_list;
       setState(() {
-        _test = currentTestList;
-        print(currentTestList);
+        if (currentTestList.isNotEmpty) {
+          _test = currentTestList;
+          print(currentTestList);
+        } else {
+          print("empty");
+        }
       });
     } catch (e) {
       print("no data found");

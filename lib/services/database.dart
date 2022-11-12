@@ -1,5 +1,3 @@
-import 'dart:ffi';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -26,20 +24,24 @@ class DatabaseService {
   final CollectionReference questionsCollection =
       FirebaseFirestore.instance.collection('questions');
 
+  final CollectionReference testTokenRefrenceCollection =
+      FirebaseFirestore.instance.collection('testref');
+
   // Stream<DocumentSnapshot<Object?>> get test {
   //   return testCollection.doc('gt').snapshots();
   // }
 
   Future postQuestion(Test test, Question question) async {
-    await questionsCollection
-        .doc(test.questionsCollectionId)
-        .collection('questions')
-        .doc("${question.question_id}")
-        .set({
-      'question': question.Questions.text,
-      'options': question.options.map((e) => e.text).toList(),
-      'answers': question.answers,
-    });
+    await questionsCollection.doc(test.questionsCollectionId).set({
+      'questions': FieldValue.arrayUnion([
+        {
+          'questionId': question.question_id,
+          'question': question.Questions.text,
+          'options': question.options.map((e) => e.text).toList(),
+          'answers': question.answers.map((e) => e ? 1 : 0).toList(),
+        },
+      ])
+    },SetOptions(merge: true));
   }
 
   Future registerUser() async {
@@ -51,6 +53,11 @@ class DatabaseService {
 
   Future postTestDetails(Test test) async {
     bool everythingOk = true;
+    //adding testRefernce(testCode) to firebase
+    await testTokenRefrenceCollection
+        .doc(test.testCode)
+        .set({'testRef': test.testid});
+
     //adding testid to admin test list
     await adminCollection
         .doc(uid)
@@ -119,5 +126,20 @@ class DatabaseService {
         .doc(uid)
         .get()
         .then((value) => _test_from_snapshot(value));
+  }
+
+  Future deleteTest(Test test) async {
+    //deleting the entry in tests
+    await testCollection.doc(test.testid).delete();
+    //deleting scoreboard for the test
+    await scoresCollection.doc(test.scoreBoardCollectionId).delete();
+    //deleting questions of that test
+    await questionsCollection.doc(test.questionsCollectionId).delete();
+    //deleting refrence test code
+    await testTokenRefrenceCollection.doc(test.testCode).delete();
+    //delete record from admin profile
+    await adminCollection.doc(uid).update({
+      'testList': FieldValue.arrayRemove([test.testid])
+    });
   }
 }

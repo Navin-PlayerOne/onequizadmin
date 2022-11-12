@@ -1,10 +1,11 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:onequizadmin/models/question_model.dart';
 import 'package:onequizadmin/models/test.dart';
 import 'package:onequizadmin/services/database.dart';
 import 'package:onequizadmin/templates/questionwidget.dart';
+
+import '../utils/utils.dart';
 
 class QuestionPageBuilder extends StatefulWidget {
   const QuestionPageBuilder({super.key});
@@ -40,7 +41,10 @@ class _QuestionPageBuilderState extends State<QuestionPageBuilder> {
               child: MaterialButton(
                 onPressed: () async {
                   if (isValid(currentIndex)) {
-                    postTest(test, questions);
+                    await postTest(test, questions);
+                    questions.clear();
+                    questions.add(Question());
+                    //Navigator.pushReplacementNamed(context, '/home');
                   } else {
                     ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
                       content: Text('Please fill all the fields'),
@@ -143,13 +147,24 @@ class _QuestionPageBuilderState extends State<QuestionPageBuilder> {
         duration: const Duration(milliseconds: 300), curve: Curves.easeIn);
   }
 
-  void postTest(Test test, List<Question> questions) {
+  Future postTest(Test test, List<Question> questions) async {
     DatabaseService _service =
         DatabaseService(uid: FirebaseAuth.instance.currentUser!.uid);
-    _service.postTestDetails(test);
+    _service.postTestDetails(test).onError((error, stackTrace) {
+      customDialog(context, false,
+          title: 'failed', content: 'Upload interupted try again later');
+    });
+    int i = 0;
     for (var question in questions) {
-      _service.postQuestion(test, question);
+      i++;
+      customDialog(context, false,
+          title: "Uploading ${i}/${questions.length}",
+          content: "please dont quit or press back");
+      await _service.postQuestion(test, question);
+      Navigator.pop(context);
     }
+    customDialog(context, true,
+        title: 'Success', content: 'Questions successfully uploaded to server');
   }
 }
 
@@ -167,14 +182,4 @@ bool isValid(int index) {
   } else {
     return false;
   }
-}
-
-void customDialog(context, {required title, required content}) {
-  showDialog(
-      context: context,
-      builder: ((context) => AlertDialog(
-            title: Text(title),
-            content: Text(content),
-          )),
-      barrierDismissible: false);
 }
