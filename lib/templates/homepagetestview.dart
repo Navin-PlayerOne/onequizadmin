@@ -27,7 +27,11 @@ class _PageWidgetState extends State<PageWidget> {
           child: ListTile(
             title: Text(widget.test.elementAt(index).testName),
             subtitle: Text("test by ${widget.test.elementAt(index).name}"),
-            onTap: () => print("selected ${index + 1}"),
+            onTap: () {
+              Navigator.pushNamed(context,'/eachtest',arguments: {
+                'test' : widget.test.elementAt(index)
+              });
+            },
             contentPadding: const EdgeInsets.all(10),
             leading: widget.test.elementAt(index).isOpen == 1
                 ? const Icon(Icons.cell_tower, color: Colors.green)
@@ -35,8 +39,6 @@ class _PageWidgetState extends State<PageWidget> {
             trailing: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text("${widget.test.elementAt(index).completedCount} "),
-                const Icon(Icons.remove_red_eye_rounded),
                 IconButton(
                   icon: const Icon(Icons.delete),
                   onPressed: () async {

@@ -1,6 +1,7 @@
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:onequizadmin/pages/eachtestdetails.dart';
 import 'package:onequizadmin/pages/home_page.dart';
 import 'package:onequizadmin/pages/questionpage.dart';
 import 'package:onequizadmin/pages/testdetails.dart';
@@ -45,9 +46,10 @@ class MyApp extends StatelessWidget {
           ),
           routes: {
             '/': (context) => AuthService().handleAuthState(),
-            '/home' :(context) => HomePage(),
-            '/question': ((context) => QuestionPageBuilder()),
+            '/home': (context) => const HomePage(),
+            '/question': ((context) => const QuestionPageBuilder()),
             '/test': (context) => TestDetails(),
+            '/eachtest': (context) =>const  EachTestControllPannel(),
           },
         );
       },

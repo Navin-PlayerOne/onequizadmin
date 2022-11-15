@@ -15,7 +15,7 @@ class AuthService {
             return const HomePage();
           } else if (snapshot.connectionState == ConnectionState.waiting) {
             return const Scaffold(
-              body: CircularProgressIndicator(),
+              body: CircularProgressIndicator(),  
             );
           } else {
             return const LoginPage();

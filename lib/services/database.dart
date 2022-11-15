@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:onequizadmin/models/scoreboard.dart';
 
 import '../models/question_model.dart';
 import '../models/test.dart';
@@ -27,6 +28,9 @@ class DatabaseService {
   final CollectionReference testTokenRefrenceCollection =
       FirebaseFirestore.instance.collection('testref');
 
+  final CollectionReference testIdentificationCollection =
+      FirebaseFirestore.instance.collection('teststatus');
+
   // Stream<DocumentSnapshot<Object?>> get test {
   //   return testCollection.doc('gt').snapshots();
   // }
@@ -41,7 +45,7 @@ class DatabaseService {
           'answers': question.answers.map((e) => e ? 1 : 0).toList(),
         },
       ])
-    },SetOptions(merge: true));
+    }, SetOptions(merge: true));
   }
 
   Future registerUser() async {
@@ -64,14 +68,6 @@ class DatabaseService {
         .set({
           'testList': FieldValue.arrayUnion([test.testid])
         }, SetOptions(merge: true))
-        .then((value) => everythingOk = true)
-        .onError((error, stackTrace) => everythingOk = false);
-    if (!everythingOk) return false;
-
-    //adding scoreboard to collections
-    await scoresCollection
-        .doc(test.scoreBoardCollectionId)
-        .set({'scores': {}})
         .then((value) => everythingOk = true)
         .onError((error, stackTrace) => everythingOk = false);
     if (!everythingOk) return false;
@@ -141,5 +137,82 @@ class DatabaseService {
     await adminCollection.doc(uid).update({
       'testList': FieldValue.arrayRemove([test.testid])
     });
+  }
+
+  Future toggleTest(val, testId) async {
+    //await testCollection.firestore.clearPersistence();
+    await testCollection.doc(testId).update({
+      'isClosed': val == true ? 1 : 0,
+    });
+  }
+
+  Future refreshTestToken(testCode, newTestCode, testId) async {
+    await testTokenRefrenceCollection.doc(testCode).delete();
+    await testTokenRefrenceCollection.doc(newTestCode).set({'testRef': testId});
+    await testCollection.doc(testId).update({'testCode': newTestCode});
+  }
+
+  Future getTestForced(testId) async {
+    List<Test> testList = [];
+    await testCollection.doc(testId).get().then((value) {
+      Map<dynamic, dynamic> eachTest = value.data() as Map;
+      testList.add(Test(
+        completedCount: 0,
+        contactMail: eachTest['supportMail'],
+        isOpen: eachTest['isClosed'],
+        name: eachTest['Name'],
+        questionsCollectionId: eachTest['questionsCollectionId'],
+        scoreBoardCollectionId: eachTest['scoreBoardCollectionId'],
+        testCode: eachTest['testCode'],
+        testName: eachTest['testName'],
+        testid: value.id,
+      ));
+    });
+    return testList.first;
+  }
+
+  // List<ScoreBoard> _getScoreBoard(DocumentSnapshot doc) {
+  //   Map data = doc.data() as Map;
+  //   List<ScoreBoard> scoreBoardList = [];
+  //   data.forEach((key, value) {
+  //     print(value);
+  //   });
+  // }
+
+  Future getScoreBoardRealTimeFake(scoreBoardId) async {
+    await scoresCollection.doc(scoreBoardId).get().then((value) {
+      Map data = value.data() as Map;
+      for (var element in data.values) {
+        Map eachScore = element;
+        eachScore.forEach((key, value) {});
+      }
+    });
+  }
+
+  List<ScoreBoardModal> _eachScores(DocumentSnapshot doc) {
+    List<ScoreBoardModal> _scoreBoard = [];
+    int i = 0;
+    Map data = doc.data() as Map;
+    for (var element in data.values) {
+      _scoreBoard.add(ScoreBoardModal(
+          mailId: element['mail'],
+          name: element['name'],
+          photoUrl: element['photoUrl'],
+          score: element['scores'] + 0.0,
+          userId: data.keys.elementAt(i)));
+      i++;
+    }
+    return _scoreBoard;
+  }
+
+  Stream<List<ScoreBoardModal>> getScoreBoardRealtime(scoreId) {
+    return scoresCollection.doc(scoreId).snapshots().map(_eachScores);
+  }
+
+  Future resetUserTest(scoreboardId, userId) async {
+    await scoresCollection
+        .doc(scoreboardId)
+        .update({userId: FieldValue.delete()});
+    await testIdentificationCollection.doc(userId).delete();
   }
 }
